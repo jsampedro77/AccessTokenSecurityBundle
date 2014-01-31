@@ -1,0 +1,3 @@
+accessToken:
+    type:     rest
+    resource: Nazka\AccessTokenSecurityBundle\Controller\AccessController

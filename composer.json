@@ -1,0 +1,32 @@
+{
+    "name": "nazka/access-token-security-bundle",
+    "type": "symfony-bundle",
+    "description": "Provides an API Security Firewall based on AccessToken in Request header",
+    "license": "GPLv2",
+    "authors": [
+        {
+            "name": "Javier Sampedro",
+            "email": "jsampedro77@gmail.com",
+            "homepage": "http://sampedrobcn.es"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.3.3",
+
+        "symfony/framework-bundle":        "~2.3",
+        "snc/redis-bundle": "1.1.*@dev"
+    },
+    "require-dev": {
+        
+    },
+    "autoload": {
+        "psr-0": { "Nazka\\AccessTokenSecurityBundle": "" }
+    },
+    "target-dir": "Nazka/AccessTokenSecurityBundle",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1.x-dev"
+        }
+    }
+}

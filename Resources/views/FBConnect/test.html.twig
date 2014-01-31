@@ -1,0 +1,72 @@
+{% extends '::base.html.twig' %}
+
+{%block body%}
+
+<h1>Test Users</h1>
+<p>
+    Elizabeth Amfjefgffjaf Sharpesky <br/>
+    100006056766016 <br/>
+    <strong>
+        mail: zvtynsc_sharpesky_1370420496@tfbnw.net <br/>
+        pass: elizabeth
+    </strong>
+</p>
+
+<p>
+    Elizabeth Amfjggeeaded Bowerssen <br/>
+    100006077551454 <br/>
+    <strong>
+        mail: spvnjoi_bowerssen_1370420490@tfbnw.net <br/>
+        pass: elizabeth
+    </strong>
+</p>
+
+<p>
+    Lisa Amfjfcgbebbg Vijayvergiyason <br/>
+    100006063725227 <br/>
+    <strong>
+        mail: ttzduei_vijayvergiyason_1370420478@tfbnw.net <br/>
+        pass: lisa
+    </strong>
+</p>
+
+   <div id="fb-root"></div>
+<script type="text/javascript">
+window.fbAsyncInit = function() {
+  FB.init({"appId":"311830135616657","xfbml":true,"oauth":true,"status":false,"cookie":true,"logging":true});
+  onFbInit();
+};
+
+(function() {
+  var e = document.createElement('script');
+  e.src = document.location.protocol + "\/\/connect.facebook.net\/en_US\/all.js";
+  e.async = true;
+  document.getElementById('fb-root').appendChild(e);
+}());
+</script>
+
+   <div class="fb-login-button" data-show-faces="false" data-size="large" data-scope="publish_actions, email, user_birthday, read_friendlists" data-autologoutlink="" data-width="" data-max-rows="1"  data-onlogin="">
+
+</div>
+
+
+
+<script language="javascript">
+    function goLogIn(token) {
+        window.location.href = '/app_dev.php/api/v1/accesstoken?fbAccessToken=' + token;
+    }
+
+    function onFbInit() {
+        if (typeof(FB) != 'undefined' && FB != null) {
+            FB.Event.subscribe('auth.statusChange', function(response) {
+                console.log(response);
+                if (response.session || response.authResponse) {
+                    setTimeout(goLogIn(response.authResponse.accessToken), 500);
+                } else {
+                    window.location.href = '/facebook/logout)';
+                }
+            });
+        }
+    }
+    </script>
+{%endblock%}
