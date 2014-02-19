@@ -2,29 +2,29 @@
 
 namespace Nazka\AccessTokenSecurityBundle\Security\Authentication\Provider;
 
-use Nazka\AccessTokenSecurityBundle\Security\Authentication\Token\ApiToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use \Symfony\Component\Security\Core\User\UserInterface;
+use Nazka\AccessTokenSecurityBundle\Security\Authentication\Token\ApiToken;
 use Nazka\AccessTokenSecurityBundle\Util\TokenGenerator;
+use Nazka\AccessTokenSecurityBundle\Persistence\PersistenceInterface;
 
 /**
  * @author Javier Sampedro <jsampedro77@gmail.com>
  */
 class AccessTokenProvider
 {
-    private $redis;
-    private $apikeyRepository;
+    private $persitenceProvider;
     private $providerKey;
     private $fbToken = null;
 
     /**
-     * "@snc_redis.default", "%MM_security.api.provider_key%"
-     * @param ? $redis
-     * @param ? $apikeyRepository
-     * @param ? $providerKey
+     * 
+     * @param \Nazka\AccessTokenSecurityBundle\Persistence\PersistenceInterface $persitenceProvider
+     * @param type $providerKey
      */
-    public function __construct($redis, $providerKey)
+    public function __construct(PersistenceInterface $persitenceProvider, $providerKey)
     {
-        $this->redis = $redis;
+        $this->persitenceProvider = $persitenceProvider;
         $this->providerKey = $providerKey;
     }
 
@@ -34,8 +34,8 @@ class AccessTokenProvider
      */
     public function fromHash($hash)
     {
-        // try to recover api token from redis
-        $token = $this->searchRedisHash($hash);
+        // try to recover api token from persitence provider
+        $token = $this->searchHash($hash);
 
         return $token;
     }
@@ -53,7 +53,7 @@ class AccessTokenProvider
         $redisKey = 'nazka_user:' . $user->getId();
         $hash = $this->redis->get($redisKey);
 
-        if (!$hash || !$this->searchRedisHash($hash)) {
+        if (!$hash || !$this->searchHash($hash)) {
             //if doesn't exist, create a new hash and store user basic data (classname, id).
 
             $hash = $this->storeAccessToken($user, array('ROLE_USER'));
@@ -68,14 +68,11 @@ class AccessTokenProvider
      * @param  stribgn     $hash
      * @return object|null
      */
-    protected function searchRedisHash($hash)
+    protected function searchHash($hash)
     {
-        
-        $data = $this->redis->get('nazka_security_token:' . $hash);
-        if ($data) {
-            $data = unserialize($data);
-            $entity = $data['entity'];
-            $apiToken = $this->createApiToken($entity, $data['roles']);
+        list($user, $roles) = $this->persitenceProvider->find($hash);
+        if ($user) {
+            $apiToken = $this->createApiToken($user, $roles);
 
             return $apiToken;
         }
@@ -89,19 +86,13 @@ class AccessTokenProvider
      * @param  TokenInterface $token
      * @return string
      */
-    protected function storeAccessToken($entity, $roles)
+    protected function storeAccessToken(UserInterface $entity, $roles)
     {
-        $data = array(
-            'entity' => $entity,
-            'roles' => $roles
-        );
-
         $tokenGenerator = new TokenGenerator();
         $hashToken = $tokenGenerator->generateToken();
 
-        //store hash in Redis
-        $this->redis->set('nazka_security_token:' . $hashToken, serialize($data));
-
+        //Persist hash
+        $this->persitenceProvider->storeHash($hashToken, $entity, $roles);
 
         return $hashToken;
     }
@@ -111,8 +102,8 @@ class AccessTokenProvider
      * @param  array    $roles
      * @return ApiToken
      */
-    protected function createApiToken($entity, $roles = array())
+    protected function createApiToken(UserInterface $user, $roles = array())
     {
-        return new ApiToken($entity, $this->providerKey, $roles);
+        return new ApiToken($user, $this->providerKey, $roles);
     }
 }
