@@ -5,7 +5,7 @@ namespace Nazka\AccessTokenSecurityBundle\Controller;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcher;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
@@ -42,7 +42,7 @@ class AccessController extends FOSRestController
             $user = $loginAuthenticationManager->checkLogin($paramFetcher->get('username'), $paramFetcher->get('password'));
             $accessToken = $this->getAuthenticationManager()->getAccessTokenForUser($user);
         } catch (\Exception $e) {
-            throw new NotFoundHttpException($e->getMessage());
+            throw new AccessDeniedHttpException($e->getMessage());
         }
 
         return array(
