@@ -2,6 +2,8 @@
 
 namespace Nazka\AccessTokenSecurityBundle\Persistence;
 
+use Symfony\Component\Security\Core\User\UserInterface;
+
 /**
  * Description of RedisPersistence
  *
@@ -17,7 +19,7 @@ class RedisPersistence implements PersistenceInterface
         $this->redis = $redis;
     }
 
-    public function findHash($hash)
+    public function findUserByHash($hash)
     {
         $data = $this->redis->get('nazka_security_token:' . $hash);
 
@@ -30,13 +32,28 @@ class RedisPersistence implements PersistenceInterface
         return null;
     }
 
-    public function storeHash($hash, $user, $roles)
+    public function storeHash($hash, UserInterface $user, array $roles)
     {
         $data = array(
             'user' => $user,
             'roles' => $roles
         );
-        
-        return $this->redis->set('nazka_security_token:' . $hashToken, serialize($data));
+
+        // store hash in so we can find it on user login.
+        $this->redis->setex($this->getUserCacheRedisKey($user->getId()), 3600, $hash);
+
+        return $this->redis->set('nazka_security_token:' . $hash, serialize($data));
+    }
+
+    public function findHashByUser(UserInterface $user)
+    {
+        $hash = $this->redis->get($this->getUserCacheRedisKey($user->getId()));
+
+        return $this->findHash($hash);
+    }
+
+    private function getUserCacheRedisKey($userId)
+    {
+        return 'nazka_security_user:' . $userId;
     }
 }

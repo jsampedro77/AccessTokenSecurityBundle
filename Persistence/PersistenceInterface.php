@@ -10,9 +10,20 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 interface PersistenceInterface
 {
-    public function findHash($hash);
+    /**
+     * Provide a hash token and find the related User,
+     * 
+     * @return Symfony\Component\Security\Core\User\UserInterface, ROLES array
+     */
+    public function findUserByHash($hash);
     
+    /**
+     * Store an UserInterface and ROLES array
+     */
     public function storeHash($hash, UserInterface $user, array $roles);
     
-    public function findUserAccessToken(UserInterface $user);
+    /**
+     * Find and AccessToken
+     */
+    public function findHashByUser(UserInterface $user);
 }
