@@ -24,8 +24,6 @@ class UsernamePasswordLoginManager
 
     public function checkLogin($username, $password)
     {
-        $token = $this->authenticationManager->authenticate(new UsernamePasswordToken($username, $password, $this->firewall));
-
-        return $token->getUser();
+        return $this->authenticationManager->authenticate(new UsernamePasswordToken($username, $password, $this->firewall));
     }
 }

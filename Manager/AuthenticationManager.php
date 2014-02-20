@@ -24,15 +24,20 @@ class AuthenticationManager implements AuthenticationProviderInterface
     }
 
     /**
-     * From an entity create a new one
+     * Get an AccessToken from another valid TokenInterface
      *
      * @param  UserInterface $user
      * @return string
      */
-    public function getAccessTokenForUser($user)
+    public function getAccessTokenFrom(TokenInterface $token)
     {
-        $hash = $this->accessTokenProvider->fromUser($user);
+        $hash = $this->accessTokenProvider->fromUser($token->getUser());
 
+        if (!$hash) {
+            //if doesn't exist, create a new hash with user and roles
+            $hash = $this->accessTokenProvider->createAccessToken($token->getUser(), $token->getRoles());
+        }
+        
         return $hash;
     }
 
