@@ -3,6 +3,7 @@ parameters:
    nazka_accesstoken_security.authentication_manager.class: Nazka\AccessTokenSecurityBundle\Manager\AuthenticationManager
    nazka_accesstoken_security.token_provider.class: Nazka\AccessTokenSecurityBundle\Security\Authentication\Provider\AccessTokenProvider
    nazka_accesstoken_security.usernamepassword.login.manager.class: Nazka\AccessTokenSecurityBundle\Manager\UsernamePasswordLoginManager
+   nazka_accesstoken_security.redis.persistence.class: Nazka\AccessTokenSecurityBundle\Persistence\RedisPersistence
    nazka_accesstoken_security.provider_key: api
 
 services:
@@ -16,11 +17,15 @@ services:
 
    nazka_accesstoken_security.access_token.provider:
         class:  %nazka_accesstoken_security.token_provider.class%
-        arguments: [@snc_redis.default, %nazka_accesstoken_security.provider_key%]
+        arguments: [@nazka_accesstoken_security.redis.persistence, %nazka_accesstoken_security.provider_key%]
         
    nazka_accesstoken_security.usernamepassword.login.manager:
         class:  %nazka_accesstoken_security.usernamepassword.login.manager.class%
         arguments: [@security.authentication.manager, %nazka_accesstoken_security.usernamepassword.provider_key%]
+        
+   nazka_accesstoken_security.redis.persistence:
+       class: %nazka_accesstoken_security.redis.persistence.class%
+       arguments: [@snc_redis.default]
         
 
 

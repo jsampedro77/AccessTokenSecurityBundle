@@ -13,10 +13,10 @@ class ApiFactory implements SecurityFactoryInterface
     public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
     {
         $providerId = 'security.authentication.provider.api.' . $id;
-        $container->setDefinition($providerId, new DefinitionDecorator('mm_security.authentication.manager'));
+        $container->setDefinition($providerId, new DefinitionDecorator('nazka_accesstoken_security.authentication.manager'));
 
         $listenerId = 'security.authentication.listener.api.' . $id;
-        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('mm_security.api.authentication.listener'));
+        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('nazka_accesstoken_security.authentication.listener'));
 
         return array($providerId, $listenerId, $defaultEntryPoint);
     }
