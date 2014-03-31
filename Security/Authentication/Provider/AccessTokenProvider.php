@@ -14,18 +14,18 @@ use Nazka\AccessTokenSecurityBundle\Persistence\PersistenceInterface;
 class AccessTokenProvider
 {
 
-    private $persitenceProvider;
+    private $persistenceProvider;
     private $providerKey;
     private $fbToken = null;
 
     /**
      * 
-     * @param \Nazka\AccessTokenSecurityBundle\Persistence\PersistenceInterface $persitenceProvider
+     * @param \Nazka\AccessTokenSecurityBundle\Persistence\PersistenceInterface $persistenceProvider
      * @param type $providerKey
      */
-    public function __construct(PersistenceInterface $persitenceProvider, $providerKey)
+    public function __construct(PersistenceInterface $persistenceProvider, $providerKey)
     {
-        $this->persitenceProvider = $persitenceProvider;
+        $this->persistenceProvider = $persistenceProvider;
         $this->providerKey = $providerKey;
     }
 
@@ -49,27 +49,9 @@ class AccessTokenProvider
     public function fromUser(UserInterface $user)
     {
         //first check if an accessToken already exists for the user
-            $hash = $this->persitenceProvider->findHashByUser($user);
-
-
+        $hash = $this->persistenceProvider->findHashByUser($user);
 
         return $hash;
-    }
-
-    /**
-     * @param  string     $hash
-     * @return ApiToken|null
-     */
-    protected function searchHash($hash)
-    {
-        list($user, $roles) = $this->persitenceProvider->findUserByHash($hash);
-        if ($user) {
-            $apiToken = $this->createApiToken($user, $roles);
-
-            return $apiToken;
-        }
-
-        return null;
     }
 
     /**
@@ -78,15 +60,31 @@ class AccessTokenProvider
      * @param  TokenInterface $token
      * @return string
      */
-    protected function createAccessToken(UserInterface $entity, array $roles)
+    public function createAccessToken(UserInterface $entity, array $roles)
     {
         $tokenGenerator = new TokenGenerator();
         $hashToken = $tokenGenerator->generateToken();
 
         //Persist hash
-        $this->persitenceProvider->storeHash($hashToken, $entity, $roles);
+        $this->persistenceProvider->storeHash($hashToken, $entity, $roles);
 
         return $hashToken;
+    }
+
+    /**
+     * @param  string     $hash
+     * @return ApiToken|null
+     */
+    protected function searchHash($hash)
+    {
+        list($user, $roles) = $this->persistenceProvider->findUserByHash($hash);
+        if ($user) {
+            $apiToken = $this->createApiToken($user, $roles);
+
+            return $apiToken;
+        }
+
+        return null;
     }
 
     /**

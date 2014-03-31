@@ -39,14 +39,14 @@ class AccessController extends FOSRestController
         $loginAuthenticationManager = $this->get('nazka_accesstoken_security.usernamepassword.login.manager');
 
         try {
-            $user = $loginAuthenticationManager->checkLogin($paramFetcher->get('username'), $paramFetcher->get('password'));
-            $accessToken = $this->getAuthenticationManager()->getAccessTokenForUser($user);
+            $usernamePasswordToken = $loginAuthenticationManager->checkLogin($paramFetcher->get('username'), $paramFetcher->get('password'));
+            $accessToken = $this->getAuthenticationManager()->getAccessTokenFrom($usernamePasswordToken);
         } catch (\Exception $e) {
             throw new AccessDeniedHttpException($e->getMessage());
         }
 
         return array(
-            'id' => $user->getId(),
+            'id' => $usernamePasswordToken->getUser()->getId(),
             'access_token' => $accessToken
         );
     }
