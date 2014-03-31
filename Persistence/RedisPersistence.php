@@ -24,7 +24,7 @@ class RedisPersistence implements PersistenceInterface
         $data = $this->redis->get('nazka_security_token:' . $hash);
 
         if ($data) {
-            unserialize($data);
+            $data = unserialize($data);
 
             return array($data['user'], $data['roles']);
         }
@@ -47,9 +47,7 @@ class RedisPersistence implements PersistenceInterface
 
     public function findHashByUser(UserInterface $user)
     {
-        $hash = $this->redis->get($this->getUserCacheRedisKey($user->getId()));
-
-        return $this->findHash($hash);
+        return $this->redis->get($this->getUserCacheRedisKey($user->getId()));
     }
 
     private function getUserCacheRedisKey($userId)
